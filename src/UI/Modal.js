@@ -28,5 +28,7 @@ export class Modal {
     }
   }
 
-  hide() {}
+  hide() {
+    console.log("hoce")
+  }
 }
