@@ -1,6 +1,6 @@
 import { Modal } from './UI/Modal';
 import { Map } from './UI/Map'
-// import { EvalSourceMapDevToolPlugin } from 'webpack';
+import { getCoordsFromAddress } from './Utility/Location';
 
 class PlaceFinder {
   constructor() {
@@ -11,7 +11,7 @@ class PlaceFinder {
     addressForm.addEventListener('submit', this.findAddressHandler.bind(this));
   }
 
-  slectPlace(coordinates){
+  selectPlace(coordinates){
     if(this.map){
         this.map.render()
     }else{
@@ -36,7 +36,7 @@ class PlaceFinder {
           lng: successResult.coords.longitude + Math.random() * 50,
         };
         // console.log(coordinates);
-        this.slectPlace(coordinates)
+        this.selectPlace(coordinates)
       },
       error => {
         modal.hide();
@@ -47,7 +47,23 @@ class PlaceFinder {
     );
   }
 
-  findAddressHandler() {}
+  async findAddressHandler(event) {
+    event.preventDefault();
+    const address = event.target.querySelector("input").value;
+    if(!address || address.trim().length === 0){
+        alert("Invalid address entered - please try again!");
+        return;
+    }
+    const modal = new Modal('loading-modal-content', 'Loading location - please wait!');
+    modal.show();
+    try{
+        const coordinates = await getCoordsFromAddress(address);
+        this.selectPlace(coordinates);
+    }catch(err){
+        alert(err.message);
+    }
+    modal.hide();
+  }
 }
 
 const placeFinder = new PlaceFinder();
